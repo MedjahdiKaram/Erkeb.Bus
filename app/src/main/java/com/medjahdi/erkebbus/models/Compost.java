@@ -1,13 +1,28 @@
 package com.medjahdi.erkebbus.models;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
+
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Compost {
-    private String busId, cardId,record;
+@IgnoreExtraProperties
+
+public class Compost  implements Serializable {
+    public void setRecord(String record) {
+        this.record = record;
+    }
+
+    private  String busId, cardId,record;
     private  double amount, longitude, latitude;
 
 
+
+    public Compost() {
+    }
 
     public Compost(String busId, String cardId, double amount) {
         this.busId = busId;
@@ -17,6 +32,7 @@ public class Compost {
         SimpleDateFormat moment = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         record = moment.format(cal.getTime());
     }
+
     public String getRecord() {
         return record;
     }
