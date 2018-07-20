@@ -7,22 +7,24 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FirebaseDataContext<T> implements ValueEventListener {
     private FirebaseDatabase fireBaseDb;
     private DatabaseReference dbReference;
     private final String parentIdKey;
-    private ArrayList<T> allChildren = null;
+    private List<T> allChildren = null;
 
 
     public FirebaseDataContext(FirebaseDatabase fireBaseDb, final String parentIdKey) {
         this.parentIdKey = parentIdKey;
         this.fireBaseDb = fireBaseDb;
         this.dbReference = this.fireBaseDb.getReference(parentIdKey);
+        this.dbReference.addValueEventListener(this);
     }
 
 
-    public void append(T object) {
+    public void create(T object) {
         try {
             this.dbReference.push().setValue(object);
         } catch (Exception ex) {
@@ -31,8 +33,9 @@ public class FirebaseDataContext<T> implements ValueEventListener {
 
     }
 
-    public void append(String childIdKey, T object) {
+    public void create(String childIdKey, T object) {
         try {
+
             this.dbReference.child(childIdKey).push().setValue(object);
         } catch (Exception ex) {
 
@@ -40,13 +43,24 @@ public class FirebaseDataContext<T> implements ValueEventListener {
     }
 
 
+    public void update(String childIdKey, String key, Object value) {
+        try {
+
+            this.dbReference.child(childIdKey).child(key).setValue(value);
+        } catch (Exception ex) {
+
+        }
+
+    }
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
         allChildren=new ArrayList<>();
         for (DataSnapshot snapshot : dataSnapshot.getChildren())
         {
             Object obj = snapshot.getValue();
+            String hashKey = snapshot.getKey();
             T typedObj = (T) obj;
+            //typedObj.setHashKey(hashKey);
             allChildren.add(typedObj);
             System.out.println(typedObj); // to be removed on prod
         }
@@ -59,7 +73,7 @@ public class FirebaseDataContext<T> implements ValueEventListener {
     }
 
 
-    public ArrayList<T> getAllChildren() {
+    public List<T> getAllChildren() {
         return allChildren;
     }
 }

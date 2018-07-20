@@ -24,75 +24,32 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "";
-    FirebaseDatabase mDatabase;
+    FirebaseDatabase firebaseDataBase;
     private CompostService compostService;
     private CardService cardService;
     List<Compost> composts = new ArrayList<Compost>();
     List<Card> cards= new ArrayList<Card>();
-    ValueEventListener compostEventListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            compostService.firebaseDataContext.onDataChange(dataSnapshot);
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-            compostService.firebaseDataContext.onCancelled(databaseError);
-//                System.out.println("The read failed: " + databaseError.getCode());
-        }
-    };
-    ValueEventListener cardEventListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            cardService.firebaseDataContext.onDataChange(dataSnapshot);
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-            cardService.firebaseDataContext.onCancelled(databaseError);
-//                System.out.println("The read failed: " + databaseError.getCode());
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-        mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference compostDbReference = mDatabase.getReference("Compost");
-        DatabaseReference cardDbReference = mDatabase.getReference("Card");
-
-        compostService = new CompostService(mDatabase);
-        cardService = new CardService(mDatabase);
-        compostDbReference.addValueEventListener(compostEventListener);
-        cardDbReference.addValueEventListener(cardEventListener);
+        firebaseDataBase = FirebaseDatabase.getInstance();
+        compostService = new CompostService(firebaseDataBase);
+        cardService = new CardService(firebaseDataBase);
         Button b = (Button) findViewById(R.id.readbtn);
-        /*for (int i=0; i<10000;i++) {
-            Card card = new Card("C"+String.valueOf(i));
-            Compost compost=new Compost("B"+String.valueOf(i*2),"C"+String.valueOf(i),20);
-           compostService.append(compost);
-            cardService.append(card);
-        }*/
+
         b.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                ArrayList<Compost> cmpresult = compostService.read();
-                ArrayList<Card> crdsresult = cardService.read();
+                List<Compost> cmpresult = compostService.read();
+                List<Card> crdsresult = cardService.read();
             }
 
 
         });
-
-        //dbReference.push().setValue(object);
-        //composts = compostService.read();
-
-
-
-
     }
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);

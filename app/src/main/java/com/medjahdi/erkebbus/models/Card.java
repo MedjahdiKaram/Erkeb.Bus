@@ -1,6 +1,7 @@
 package com.medjahdi.erkebbus.models;
 
 import com.google.firebase.database.IgnoreExtraProperties;
+import com.medjahdi.erkebbus.helpers.Common;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -14,6 +15,15 @@ public class Card implements Serializable {
     private  String cardId,creationRecord, updateRecord;
     private  double currentBalance;
 
+    public String getHashKey() {
+        return hashKey;
+    }
+
+    public void setHashKey(String hashKey) {
+        this.hashKey = hashKey;
+    }
+
+    private String hashKey;
 
 
     public Card() {
@@ -29,9 +39,7 @@ public class Card implements Serializable {
     public Card(String cardId, double currentBalance) {
         this.cardId = cardId;
         this.currentBalance = currentBalance;
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat moment = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        this.creationRecord = this.updateRecord = moment.format(cal.getTime());
+        this.creationRecord = this.updateRecord = Common.getCurrentDateTime();
     }
 
     public Card(String cardId, String creationRecord, double currentBalance) {

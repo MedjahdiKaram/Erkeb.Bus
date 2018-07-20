@@ -2,6 +2,7 @@ package com.medjahdi.erkebbus.models;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
+import com.medjahdi.erkebbus.helpers.Common;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -28,9 +29,7 @@ public class Compost  implements Serializable {
         this.busId = busId;
         this.cardId = cardId;
         this.amount = amount;
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat moment = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        record = moment.format(cal.getTime());
+        record = Common.getCurrentDateTime();
     }
 
     public String getRecord() {
