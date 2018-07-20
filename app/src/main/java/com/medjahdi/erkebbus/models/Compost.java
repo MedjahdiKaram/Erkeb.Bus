@@ -18,7 +18,7 @@ public class Compost  implements Serializable {
     }
 
     private  String busId, cardId,record;
-    private  double amount, longitude, latitude;
+    private  double amount;
 
 
 
@@ -35,23 +35,6 @@ public class Compost  implements Serializable {
     public String getRecord() {
         return record;
     }
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-
 
     public String getBusId() {
         return busId;

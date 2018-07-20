@@ -35,15 +35,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         firebaseDataBase = FirebaseDatabase.getInstance();
-        compostService = new CompostService(firebaseDataBase);
-        cardService = new CardService(firebaseDataBase);
+        compostService = new CompostService(firebaseDataBase, this,getString(R.string.composts_creation_query));
+        cardService = new CardService(firebaseDataBase, this,getString(R.string.cards_creation_query));
         Button b = (Button) findViewById(R.id.readbtn);
 
         b.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                List<Compost> cmpresult = compostService.read();
-                List<Card> crdsresult = cardService.read();
+                //List<Compost> cmpresult = compostService.read();
+                //List<Card> crdsresult = cardService.read();
+                Card card = new Card("9100001");
+                cardService.db_create(card);
+                int val = cardService.db_count();
             }
 
 

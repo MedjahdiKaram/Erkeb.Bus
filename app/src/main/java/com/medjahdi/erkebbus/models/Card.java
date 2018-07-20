@@ -14,6 +14,7 @@ public class Card implements Serializable {
 
     private  String cardId,creationRecord, updateRecord;
     private  double currentBalance;
+    private String hashKey;
 
     public String getHashKey() {
         return hashKey;
@@ -23,7 +24,7 @@ public class Card implements Serializable {
         this.hashKey = hashKey;
     }
 
-    private String hashKey;
+
 
 
     public Card() {

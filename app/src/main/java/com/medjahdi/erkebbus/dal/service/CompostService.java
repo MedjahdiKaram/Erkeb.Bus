@@ -1,15 +1,24 @@
 package com.medjahdi.erkebbus.dal.service;
 
+import android.content.Context;
+
 import com.google.firebase.database.FirebaseDatabase;
+import com.medjahdi.erkebbus.R;
+import com.medjahdi.erkebbus.dal.DatabaseHandler;
+import com.medjahdi.erkebbus.dal.FirebaseDataContext;
+import com.medjahdi.erkebbus.models.Card;
 import com.medjahdi.erkebbus.models.Compost;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompostService extends ServiceBase<Compost> {
+public class CompostService extends DatabaseHandler implements IServiceBase<Compost> {
+    List<Compost> allChildren ;
+    FirebaseDataContext<Compost> firebaseDataContext;
+    public CompostService( FirebaseDatabase firebaseDatabase, Context context,String creationQuery) {
+        super(context,"Erkab.bus",creationQuery);
 
-    public CompostService(FirebaseDatabase firebaseDatabase) {
-      super(firebaseDatabase,"Compost");
+        firebaseDataContext = new FirebaseDataContext<>(firebaseDatabase, "Compost");
     }
 
 
