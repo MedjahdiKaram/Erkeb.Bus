@@ -14,12 +14,10 @@ import com.medjahdi.erkebbus.models.Compost;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CardService extends DatabaseHandler implements IServiceBase<Card>  {
-    List<Card> allChildren ;
-    FirebaseDataContext<Card> firebaseDataContext;
+public class CardService extends ServiceBase<Card>  {
+
     public CardService(FirebaseDatabase firebaseDatabase, Context context, String creationQuery) {
-        super(context,"Erkab.bus",creationQuery);
-        firebaseDataContext = new FirebaseDataContext<>(firebaseDatabase, "Card");
+        super(firebaseDatabase,"Card",context,creationQuery);
     }
 
     @Override

@@ -12,13 +12,10 @@ import com.medjahdi.erkebbus.models.Compost;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompostService extends DatabaseHandler implements IServiceBase<Compost> {
-    List<Compost> allChildren ;
-    FirebaseDataContext<Compost> firebaseDataContext;
-    public CompostService( FirebaseDatabase firebaseDatabase, Context context,String creationQuery) {
-        super(context,"Erkab.bus",creationQuery);
+public class CompostService  extends ServiceBase<Compost>  {
 
-        firebaseDataContext = new FirebaseDataContext<>(firebaseDatabase, "Compost");
+    public CompostService( FirebaseDatabase firebaseDatabase, Context context,String creationQuery) {
+        super(firebaseDatabase,"Compost",context,creationQuery);
     }
 
 
