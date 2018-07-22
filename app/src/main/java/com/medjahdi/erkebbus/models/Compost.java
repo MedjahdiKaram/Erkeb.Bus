@@ -1,14 +1,9 @@
 package com.medjahdi.erkebbus.models;
 
-import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.medjahdi.erkebbus.helpers.Common;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 @IgnoreExtraProperties
 
@@ -19,8 +14,15 @@ public class Compost  implements Serializable {
 
     private  String busId, cardId,record;
     private  double amount;
+    private String hashKey;
 
+    public String getHashKey() {
+        return hashKey;
+    }
 
+    public void setHashKey(String hashKey) {
+        this.hashKey = hashKey;
+    }
 
     public Compost() {
     }
