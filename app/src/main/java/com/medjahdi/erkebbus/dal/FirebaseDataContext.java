@@ -1,26 +1,30 @@
 package com.medjahdi.erkebbus.dal;
 
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class FirebaseDataContext<T> {
+
+
     private FirebaseDatabase fireBaseDb;
     private DatabaseReference dbReference;
     private final String parentIdKey;
-
 
     public FirebaseDataContext(FirebaseDatabase fireBaseDb, final String parentIdKey) {
         this.parentIdKey = parentIdKey;
         this.fireBaseDb = fireBaseDb;
         this.dbReference = this.fireBaseDb.getReference(parentIdKey);
-
+        this.dbReference.keepSynced(true);
     }
-
-    public void setEvenetListener(ValueEventListener valueEventListener)
-    {
+    public FirebaseDatabase getFireBaseDb() {
+        return fireBaseDb;
+    }
+    public void setEvenetListener(ValueEventListener valueEventListener) {
         this.dbReference.addValueEventListener(valueEventListener);
     }
+
     public void create(T object) {
         try {
             this.dbReference.push().setValue(object);
@@ -39,7 +43,6 @@ public class FirebaseDataContext<T> {
         }
     }
 
-
     public void update(String childIdKey, String key, Object value) {
         try {
 
@@ -50,7 +53,10 @@ public class FirebaseDataContext<T> {
 
     }
 
-
+    public void delete (String childIdKey)
+    {
+        this.dbReference.child(childIdKey).removeValue();
+    }
 
 
 }

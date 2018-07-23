@@ -1,8 +1,25 @@
 package com.medjahdi.erkebbus.models;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.medjahdi.erkebbus.R;
+import com.medjahdi.erkebbus.dal.DatabaseHandler;
+
+import java.util.ArrayList;
+
 public class Config {
     private String busId;
-    private float minimumAmountToCompost;
+    private float minimumAmountToCompost, compostAmount;
+
+    public Config(String busId, float minimumAmountToCompost, float compostAmount) {
+
+        this.busId = busId;
+        this.minimumAmountToCompost = minimumAmountToCompost;
+        this.compostAmount = compostAmount;
+    }
 
     public String getBusId() {
         return busId;
@@ -28,12 +45,5 @@ public class Config {
         this.compostAmount = compostAmount;
     }
 
-    public Config(String busId, float minimumAmountToCompost, float compostAmount) {
 
-        this.busId = busId;
-        this.minimumAmountToCompost = minimumAmountToCompost;
-        this.compostAmount = compostAmount;
-    }
-
-    private float compostAmount;
 }

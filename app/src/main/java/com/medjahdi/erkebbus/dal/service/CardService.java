@@ -41,7 +41,8 @@ public class CardService extends ServiceBase<Card> {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
+                checkFirebaseConnectivityStatus(databaseError);
+                System.out.println("card reader failed " + databaseError.getCode());
             }
         };
         firebaseDataContext.setEvenetListener(eventlistener);
@@ -63,9 +64,26 @@ public class CardService extends ServiceBase<Card> {
     }
 
     @Override
+    public void delete(Card object) {
+        firebaseDataContext.delete(object.getHashKey());
+    }
+
+    @Override
     public ArrayList<Card> read() {
         return allChildren;
     }
+
+    @Override
+    public Card read(String cardId) {
+        for (Card card:allChildren)
+        {
+            String fbCardId=card.getCardId();
+            if (card!=null && card.getCardId() == fbCardId)
+                return card;
+        }
+        return null;
+    }
+
 
     public void updateBalance(String childIdKey, double value) {
         this.update(childIdKey, "currentBalance", value);

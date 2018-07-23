@@ -1,5 +1,7 @@
 package com.medjahdi.erkebbus.controller;
 
+import android.content.Context;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -16,65 +18,39 @@ public class MainController {
     private Config configuration;
     private CompostService compostService;
     private CardService cardService;
-    private ArrayList<Card> allCards;
     private FirebaseDatabase fireBaseDatabase;
     private Card card;
+
 
 
     public MainController() {
     }
 
-    public MainController(Config configuration, CompostService compostService, CardService cardService,ArrayList<Card> allCards) {
-        this.configuration   = configuration;
-        this.compostService  = compostService;
-        this.cardService     = cardService   ;
-        this.allCards        = allCards;
+    public MainController(Config configuration, FirebaseDatabase fireBaseDatabase, Context context) {
+        this.configuration = configuration;
+         this.fireBaseDatabase=fireBaseDatabase;
+        this.compostService = new CompostService(fireBaseDatabase,context);
+        this.cardService =  new CardService(fireBaseDatabase,context);;
     }
 
-    public boolean runCompostTransaction(Card card, DatabaseError error)
-    {
-        this.card=card;
-        boolean result = false;
-        float compostAmount= configuration.getCompostAmount();
-        Compost compost = new Compost(configuration.getBusId(),card.getCardId(),compostAmount);
-        boolean isFirebaseUp=this.testFirebaseِConnectivity(error);
-        if (isFirebaseUp)
-        {
-            result= onlineCompost(compost, compostAmount);
-        }
-        else
-        {
-            result = offlineCompost(compost, compostAmount);
+    public double[] runCompostTransaction(String cardId) {
+        this.card = cardService.read(cardId);
+        float compostAmount = configuration.getCompostAmount();
+        Compost compost = new Compost(configuration.getBusId(), card.getCardId(), compostAmount);
+        double result[]={0,0};
+        double oldBalance=card.getCurrentBalance();
+        result[0]=oldBalance;
+        double newBalance = oldBalance- compostAmount;
+        if (newBalance > configuration.getMinimumAmountToCompost()) {
+            cardService.updateBalance(card.getHashKey(), newBalance);
+            cardService.updateOfflineBalance(card.getHashKey(), newBalance);
+            result[1]=newBalance;
+            compostService.create(compost);
         }
         return result;
-
     }
 
 
-    private boolean onlineCompost( Compost compost, float compostAmount)
-    {
-        compostService.create(compost);
-        double newBalance=card.getCurrentBalance()- compostAmount;
-        if (newBalance>configuration.getMinimumAmountToCompost())
-        {
-            cardService.updateBalance(card.getHashKey(),newBalance);
-            cardService.updateOfflineBalance(card.getHashKey(),newBalance);
-            return true;
-        }
-        return false;
-    }
-    private boolean offlineCompost (Compost compost, float compostAmount) {
-        double newBalance=card.getCurrentBalance()- compostAmount;
-        if (newBalance>configuration.getMinimumAmountToCompost())
-        {
-            cardService.updateOfflineBalance(card.getHashKey(),newBalance);
-            compostService.updateOffline(compost);
-            return true;
-        }
-        return false;
-    }
 
-    protected boolean testFirebaseِConnectivity(DatabaseError error) {
-        return  error.getCode()==DatabaseError.DISCONNECTED || error.getCode()==DatabaseError.UNAVAILABLE || error.getCode()==DatabaseError.NETWORK_ERROR;
-    }
+
 }

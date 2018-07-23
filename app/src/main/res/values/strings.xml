@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">Erkeb.Bus</string>
+    <string name="sql_database_name">@string/app_name</string>
     <string name="sql_table_collection__compost_name">Compost</string>
     <string name="sql_table_collection__card_name">Card</string>
     <string name="sql_query_card_table_creation">CREATE TABLE Card (id INTEGER PRIMARY KEY AUTOINCREMENT,hashKey TEXT, cardId TEXT, creationRecord TEXT, updateRecord TEXT, currentBalance REAL)</string>
     <string name="sql_query_compost_table_creation">CREATE TABLE Compost (id INTEGER PRIMARY KEY AUTOINCREMENT, busId TEXT, cardId TEXT,record TEXT, amount REAL)</string>
+    <string name="sql_query_config_table_creation">CREATE TABLE Config (id INTEGER PRIMARY KEY AUTOINCREMENT, busId TEXT, minimumAmountToCompost REAL,compostAmount REAL)</string>
+    <string name="title_activity_configure">ConfigureActivity</string>
 
 </resources>

@@ -16,13 +16,7 @@ public class Compost  implements Serializable {
     private  double amount;
     private String hashKey;
 
-    public String getHashKey() {
-        return hashKey;
-    }
 
-    public void setHashKey(String hashKey) {
-        this.hashKey = hashKey;
-    }
 
     public Compost() {
     }
@@ -60,5 +54,12 @@ public class Compost  implements Serializable {
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+    public String getHashKey() {
+        return hashKey;
+    }
+
+    public void setHashKey(String hashKey) {
+        this.hashKey = hashKey;
     }
 }
