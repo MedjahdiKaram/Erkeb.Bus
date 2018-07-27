@@ -1,36 +1,44 @@
 package com.medjahdi.erkebbus;
 
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Logger;
-import com.google.firebase.database.ValueEventListener;
-
-
+import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
+import com.hoho.android.usbserial.driver.Ch34xSerialDriver;
+import com.hoho.android.usbserial.driver.Cp21xxSerialDriver;
+import com.hoho.android.usbserial.driver.FtdiSerialDriver;
+import com.hoho.android.usbserial.driver.ProbeTable;
+import com.hoho.android.usbserial.driver.UsbSerialDriver;
+import com.hoho.android.usbserial.driver.UsbSerialPort;
+import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.medjahdi.erkebbus.controller.MainController;
 import com.medjahdi.erkebbus.dal.service.CardService;
 import com.medjahdi.erkebbus.dal.service.CompostService;
 import com.medjahdi.erkebbus.dal.service.ConfigService;
-import com.medjahdi.erkebbus.helpers.Common;
 import com.medjahdi.erkebbus.models.Card;
 import com.medjahdi.erkebbus.models.Compost;
 import com.medjahdi.erkebbus.models.Config;
 
-
-import java.lang.reflect.Type;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    //region Attributes
     private static final String TAG = "";
     FirebaseDatabase firebaseDataBase;
     private CompostService compostService;
@@ -40,32 +48,47 @@ public class MainActivity extends AppCompatActivity {
     List<Card> cards = new ArrayList<Card>();
     public static Config mainConfig;
     private MainController controller;
+
+    //endregion
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        //region Services and instance initiation
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         firebaseDataBase = FirebaseDatabase.getInstance();
-        firebaseDataBase.getInstance().setPersistenceEnabled(true);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         firebaseDataBase.setLogLevel(BuildConfig.DEBUG ? Logger.Level.DEBUG : Logger.Level.NONE);
         compostService = new CompostService(firebaseDataBase, this);
         cardService = new CardService(firebaseDataBase, this);
         configService = new ConfigService(this, getString(R.string.sql_database_name));
+
+
+
+
+        //endregion
+        //region configuration initiator
+
+
+
+
 
         ArrayList<Config> configs= configService.db_read();
         if (configs!=null && configs.size()>0)
             mainConfig= configService.db_read().get(0);
         if (mainConfig==null)
             gotoConfigurationActivity();
+        //endregion
         else
         {
-            TextView tv = (TextView) findViewById(R.id.busTextView);
+            TextView tv = findViewById(R.id.busTextView);
             String busId="Bus N°: "+mainConfig.getBusId();
             tv.setText(busId);
             controller= new MainController(mainConfig,firebaseDataBase,this);
 
-            final TextView oldBalanceView= (TextView) findViewById(R.id.oldBalanceView);
-            final TextView newBalanceView= (TextView) findViewById(R.id.newBalanceView);
+            final TextView oldBalanceView= findViewById(R.id.oldBalanceView);
+            final TextView newBalanceView= findViewById(R.id.newBalanceView);
+            //region Button for testing purpose
+
             oldBalanceView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -75,6 +98,115 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+
+
+            //endregion
+            ProbeTable customTable = new ProbeTable();
+            customTable.addProduct(0x2A03, 0x0043, CdcAcmSerialDriver.class);
+            //customTable.addProduct(0x1234, 0x0002, CdcAcmSerialDriver.class);
+
+            UsbSerialProber prober = new UsbSerialProber(customTable);
+
+
+            UsbManager manager = (UsbManager) getSystemService(this.USB_SERVICE);
+         //   List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
+            List<UsbSerialDriver> availableDrivers = prober.findAllDrivers(manager);
+            if (availableDrivers.isEmpty()) {
+                return;
+            }
+
+// Open a connection to the first available driver.
+            UsbSerialDriver driver = availableDrivers.get(0);
+            UsbDevice device=driver.getDevice();
+            String ACTION_USB_PERMISSION = "com.medjahdi.erkebbus.USB_PERMISSION";
+
+            PendingIntent mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(
+                    ACTION_USB_PERMISSION), 0);
+            IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+            manager.requestPermission(device,mPermissionIntent);
+            boolean hasperm=manager.hasPermission(device);
+            UsbDeviceConnection connection = manager.openDevice(device);
+            if (connection == null) {
+                // You probably need to call UsbManager.requestPermission(driver.getDevice(), ..)
+                return;
+            }
+
+// Read some data! Most have just one port (port 0).
+            UsbSerialPort port = driver.getPorts().get(0);
+            try {
+                port.open(connection);
+                port.setParameters(9600, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+
+                byte buffer[] = new byte[16];
+
+                int numBytesRead = port.read(buffer, 1000);
+                String message = new String(buffer);
+                String fromDuino = new String(message);
+                Log.d(TAG, "Read " + numBytesRead + " bytes.");
+            } catch (IOException e) {
+                // Deal with error.
+            } finally {
+                try {
+                    port.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+            try {
+
+                arduino.setArduinoListener(new ArduinoListener() {
+                    @Override
+                    public void onArduinoAttached(UsbDevice device) {
+                        Toast.makeText(firebaseDataBase.getApp().getApplicationContext(), "Yo ! Hardware plugged sahhit", Toast.LENGTH_LONG).show();
+                        arduino.open(device);
+
+
+                    }
+
+                    @Override
+                    public void onArduinoDetached() {
+                        Toast.makeText(firebaseDataBase.getApp().getApplicationContext(), "Yo ! Hardware Communication cut or unpluged ! sahhit", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onArduinoMessage(byte[] bytes) {
+                        String message = new String(bytes);
+                        String fromDuino = new String(message);
+                        double[] balances = controller.runCompostTransaction(fromDuino);
+                        oldBalanceView.setText(String.valueOf(balances[0]));
+                        newBalanceView.setText(String.valueOf(balances[1]));
+                    }
+
+                    @Override
+                    public void onArduinoOpened() {
+                        Toast.makeText(firebaseDataBase.getApp().getApplicationContext(), "Yo ! Hardware Communication opened ! sahhit", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onUsbPermissionDenied() {
+                        Toast.makeText(firebaseDataBase.getApp().getApplicationContext(), "Yo ! No permission to use the usb device ! sahhit", Toast.LENGTH_LONG).show();
+                    }
+                });
+                arduino.reopen();
+            }
+            catch (Exception ex)
+            {
+                System.out.println(ex);
+            }
+*/
 
         }
     }
