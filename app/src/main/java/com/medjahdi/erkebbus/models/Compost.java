@@ -12,7 +12,7 @@ public class Compost  implements Serializable {
         this.record = record;
     }
 
-    private  String busId, cardId,record;
+    private  String busId, lineNumber,cardId,record;
     private  double amount;
     private String hashKey;
 
@@ -21,10 +21,11 @@ public class Compost  implements Serializable {
     public Compost() {
     }
 
-    public Compost(String busId, String cardId, double amount) {
+    public Compost(String busId, String lineNumber, String cardId, double amount) {
         this.busId = busId;
         this.cardId = cardId;
         this.amount = amount;
+        this.lineNumber=lineNumber;
         record = Common.getCurrentDateTime();
     }
 
@@ -61,5 +62,13 @@ public class Compost  implements Serializable {
 
     public void setHashKey(String hashKey) {
         this.hashKey = hashKey;
+    }
+
+    public String getLineNumber() {
+        return lineNumber;
+    }
+
+    public void setLineNumber(String lineNumber) {
+        this.lineNumber = lineNumber;
     }
 }

@@ -31,10 +31,10 @@ public final class Common {
         String output = "";
         Pattern pattern= Pattern.compile("#(\\w{8})");
         Matcher matcher = pattern.matcher(stringObject);
-        if (matcher.find( )==false) {
+        /*if (matcher.find( )==false) {
             pattern= Pattern.compile("#(\\w{7})");
             matcher = pattern.matcher(stringObject);
-        }
+        }*/
         if (matcher.find( )==false) {
             return null;
         }

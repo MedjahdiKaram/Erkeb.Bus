@@ -60,7 +60,8 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         //region Services and instance initiation
         super.onCreate(savedInstanceState);
-        arduino = new Arduino(this);
+
+
         setContentView(R.layout.activity_home);
         firebaseDataBase = FirebaseDatabase.getInstance();
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
@@ -75,12 +76,16 @@ public class HomeActivity extends AppCompatActivity {
 
 
         ArrayList<Config> configs = configService.db_read();
+
+
         if (configs != null && configs.size() > 0)
             mainConfig = configService.db_read().get(0);
         if (mainConfig == null)
             gotoConfigurationActivity();
             //endregion
         else {
+            Integer vid = Integer.parseInt(mainConfig.getVid());
+            arduino = new Arduino(this,vid);
             TextView tv = findViewById(R.id.busTextView);
             String busId = "Bus N°: " + mainConfig.getBusId();
             tv.setText(busId);

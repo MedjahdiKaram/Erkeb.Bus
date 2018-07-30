@@ -25,9 +25,15 @@ public class ConfigureActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String busId=((TextView)findViewById(R.id.busIdTxt)).getText().toString();
+                String lineNum=((TextView)findViewById(R.id.lineNumTxt)).getText().toString();
+
+                String pid=((TextView)findViewById(R.id.pidTxt)).getText().toString();
+
+                String vid=((TextView)findViewById(R.id.vidTxt)).getText().toString();
+
                 float minAmount= Float.parseFloat(((EditText)findViewById(R.id.minCompostTxt)).getText().toString());
                 float amount= Float.parseFloat(((EditText)findViewById(R.id.tarifTxt)).getText().toString());
-                Config cfg= new Config(busId,minAmount,amount);
+                Config cfg= new Config(busId,lineNum,vid,pid,minAmount,amount);
                 HomeActivity.configService.db_create(cfg);
                 Toast.makeText(view.getContext(), "Configuration saved", Toast.LENGTH_LONG).show();
             }

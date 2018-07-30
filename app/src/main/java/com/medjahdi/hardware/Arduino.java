@@ -41,22 +41,22 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
     private static final String ACTION_USB_PERMISSION = "com.medjahdi.erkebbus.USB_PERMISSION";
     private static final int DEFAULT_BAUD_RATE = 9600;
 
-    public Arduino(Context context, int baudRate) {
-        init(context, baudRate);
+    public Arduino(Context context, int baudRate, Integer vid) {
+        init(context, baudRate,vid);
     }
 
-    public Arduino(Context context) {
-        init(context, DEFAULT_BAUD_RATE);
+    public Arduino(Context context, Integer vid) {
+        init(context, DEFAULT_BAUD_RATE,vid);
     }
 
-    private void init(Context context, int baudRate) {
+    private void init(Context context, int baudRate, Integer vid) {
         this.context = context;
         this.usbReceiver = new UsbReceiver();
         this.usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
         this.baudRate = baudRate;
         this.isOpened = false;
         this.vendorIds = new ArrayList<>();
-        this.vendorIds.add(10755);
+        this.vendorIds.add(vid);
 
     }
 
@@ -69,7 +69,7 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
         intentFilter.addAction(ACTION_USB_PERMISSION);
         context.registerReceiver(usbReceiver, intentFilter);
 
-        lastArduinoAttached = getAttachedArduino();
+        lastArduinoAttached = getAttachedArduino(vendorIds.get(0));
         if (lastArduinoAttached != null && listener != null) {
             listener.onArduinoAttached(lastArduinoAttached);
         }
@@ -169,9 +169,9 @@ public class Arduino implements UsbSerialInterface.UsbReadCallback {
         }
     }
 
-    private UsbDevice getAttachedArduino() {
+    private UsbDevice getAttachedArduino(Integer vid) {
         ProbeTable customTable = new ProbeTable();
-        customTable.addProduct(0x2A03, 0x0043, CdcAcmSerialDriver.class);
+        customTable.addProduct(vid, 29987, CdcAcmSerialDriver.class);
         //customTable.addProduct(0x1234, 0x0002, CdcAcmSerialDriver.class);
 
         UsbSerialProber prober = new UsbSerialProber(customTable);

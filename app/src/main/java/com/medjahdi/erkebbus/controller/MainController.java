@@ -36,7 +36,7 @@ public class MainController {
     public double[] runCompostTransaction(String cardId) {
         this.card = cardService.read(cardId);
         float compostAmount = configuration.getCompostAmount();
-        Compost compost = new Compost(configuration.getBusId(), card.getCardId(), compostAmount);
+        Compost compost = new Compost(configuration.getBusId(),configuration.getLineNumber(), card.getCardId(), compostAmount);
         double result[]={0,0};
         double oldBalance=card.getCurrentBalance();
         result[0]=oldBalance;

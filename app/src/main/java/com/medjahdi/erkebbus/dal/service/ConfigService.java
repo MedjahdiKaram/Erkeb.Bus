@@ -21,6 +21,9 @@ public class ConfigService extends DatabaseHandler {
     public boolean db_create(Config obj) {
         ContentValues values = new ContentValues();
         values.put("busId", obj.getBusId());
+        values.put("lineNumber", obj.getLineNumber());
+        values.put("pid", obj.getPid());
+        values.put("vid", obj.getVid());
         values.put("minimumAmountToCompost", obj.getMinimumAmountToCompost());
         values.put("compostAmount", obj.getCompostAmount());
 
@@ -43,9 +46,12 @@ public class ConfigService extends DatabaseHandler {
                     if (configList==null)
                         configList = new ArrayList<Config>();
                     String busId = cursor.getString(cursor.getColumnIndex("busId"));
+                    String lineNum = cursor.getString(cursor.getColumnIndex("lineNumber"));
+                    String pid = cursor.getString(cursor.getColumnIndex("pid"));
+                    String vid = cursor.getString(cursor.getColumnIndex("vid"));
                     Float compostAmount = Float.valueOf(cursor.getString(cursor.getColumnIndex("compostAmount")));
                     Float minimumAmountToCompost = Float.valueOf(cursor.getString(cursor.getColumnIndex("minimumAmountToCompost")));
-                    Config config = new Config(busId, minimumAmountToCompost, compostAmount);
+                    Config config = new Config(busId,lineNum, vid,pid, minimumAmountToCompost, compostAmount);
 
                     configList.add(config);
 
