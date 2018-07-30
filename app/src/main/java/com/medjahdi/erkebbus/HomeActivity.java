@@ -40,7 +40,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class MainActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity {
     //region Attributes
     private static final String TAG = "";
     FirebaseDatabase firebaseDataBase;
@@ -53,20 +53,22 @@ public class MainActivity extends AppCompatActivity {
     private MainController controller;
     private Arduino arduino;
     String message;
+    private boolean processing_mutex;
+
     //endregion
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //region Services and instance initiation
         super.onCreate(savedInstanceState);
-        arduino=new Arduino(this);
-        setContentView(R.layout.activity_main);
+        arduino = new Arduino(this);
+        setContentView(R.layout.activity_home);
         firebaseDataBase = FirebaseDatabase.getInstance();
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         firebaseDataBase.setLogLevel(BuildConfig.DEBUG ? Logger.Level.DEBUG : Logger.Level.NONE);
         compostService = new CompostService(firebaseDataBase, this);
         cardService = new CardService(firebaseDataBase, this);
         configService = new ConfigService(this, getString(R.string.sql_database_name));
-
+        processing_mutex = false;
 
         //endregion
         //region configuration initiator
@@ -159,13 +161,6 @@ System.out.println(fromDuino);
 */
 
 
-
-
-
-
-
-
-
             try {
 
 
@@ -187,31 +182,32 @@ System.out.println(fromDuino);
                     public void onArduinoMessage(byte[] bytes) {
                         try {
                             message = message + new String(bytes);
-                            if (message.length() >= 10 && Common.countOccurences(message, '#') % 2 == 0) {
-                                String id = Common.CardIdExtractor(message, '#');
+                            String id = Common.CardIdExtractor(message);
+                            Thread.sleep(200);
+                            if (id != null && processing_mutex == false) {
+                                processing_mutex = true;
                                 System.out.println("Id: " + id);
-                                if (id != null && id.length() == 7) {
-                                    final double[] balances = controller.runCompostTransaction(id);
-                                    runOnUiThread(new Runnable() {
+                                final double[] balances = controller.runCompostTransaction(id);
+                                runOnUiThread(new Runnable() {
 
-                                        @Override
-                                        public void run() {
+                                    @Override
+                                    public void run() {
 
-                                             oldBalanceView.setText(String.valueOf(balances[0]));
-                                            newBalanceView.setText(String.valueOf(balances[1]));
+                                        oldBalanceView.setText("Ancien solde:" + String.valueOf(balances[0]));
+                                        newBalanceView.setText("Ancien solde:" + String.valueOf(balances[1]));
 
-                                        }
-                                    });
+                                    }
+                                });
 
-                                }
+
                             }
-                            String fromDuino = new String(message);
-                        }
-                        catch (Exception ex)
-                        {
+                            message = "";
+                            processing_mutex = false;
+                        } catch (Exception ex) {
                             System.out.println(ex);
                         }
-                       // double[] balances = controller.runCompostTransaction(fromDuino);
+
+                        // double[] balances = controller.runCompostTransaction(fromDuino);
                         //oldBalanceView.setText(String.valueOf(balances[0]));
                         //newBalanceView.setText(String.valueOf(balances[1]));
                     }
@@ -226,10 +222,8 @@ System.out.println(fromDuino);
                         Toast.makeText(firebaseDataBase.getApp().getApplicationContext(), "Yo ! No permission to use the usb device ! sahhit", Toast.LENGTH_LONG).show();
                     }
                 });
-               // arduino.reopen();
-            }
-            catch (Exception ex)
-            {
+                // arduino.reopen();
+            } catch (Exception ex) {
                 System.out.println(ex);
             }
 
@@ -240,7 +234,7 @@ System.out.println(fromDuino);
 
     public void gotoConfigurationActivity() {
         try {
-            Intent k = new Intent(MainActivity.this, ConfigureActivity.class);
+            Intent k = new Intent(HomeActivity.this, ConfigureActivity.class);
             startActivity(k);
         } catch (Exception e) {
             e.printStackTrace();

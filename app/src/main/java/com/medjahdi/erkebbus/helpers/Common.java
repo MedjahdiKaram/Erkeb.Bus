@@ -23,31 +23,25 @@ public final class Common {
         return result;
     }
 
-    public static int countOccurences(
-            String stringObject, char searchedChar) {
 
-        int counter = 0;
-        for (int i = 0; i < stringObject.length(); i++) {
-            if (stringObject.charAt(i) == searchedChar) {
-                counter++;
-            }
-        }
-        return counter;
-    }
 
     public static String CardIdExtractor(
-            String stringObject, char delimiter) {
+            String stringObject) {
         int counter=0;
         String output = "";
-        for (int i = 0; i < stringObject.length(); i++) {
-            if (stringObject.charAt(i) == delimiter) {
-                {
-                    return stringObject.substring(i+1,i+8);
-                }
-            }
+        Pattern pattern= Pattern.compile("#(\\w{8})");
+        Matcher matcher = pattern.matcher(stringObject);
+        if (matcher.find( )==false) {
+            pattern= Pattern.compile("#(\\w{7})");
+            matcher = pattern.matcher(stringObject);
         }
-        return null;
-    }
+        if (matcher.find( )==false) {
+            return null;
+        }
+        return matcher.group(matcher.groupCount());
+        }
+
+
 
 
 }

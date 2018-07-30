@@ -41,7 +41,7 @@ public class MainController {
         double oldBalance=card.getCurrentBalance();
         result[0]=oldBalance;
         double newBalance = oldBalance- compostAmount;
-        if (newBalance > configuration.getMinimumAmountToCompost()) {
+        if (newBalance >= configuration.getMinimumAmountToCompost()) {
             cardService.updateBalance(card.getHashKey(), newBalance);
             cardService.updateOfflineBalance(card.getHashKey(), newBalance);
             result[1]=newBalance;

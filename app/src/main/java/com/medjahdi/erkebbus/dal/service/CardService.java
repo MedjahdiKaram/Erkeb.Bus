@@ -78,7 +78,7 @@ public class CardService extends ServiceBase<Card> {
         for (Card card:allChildren)
         {
             String fbCardId=card.getCardId();
-            if (card!=null && card.getCardId() == fbCardId)
+            if (card!=null && fbCardId.equals(cardId))
                 return card;
         }
         return null;

@@ -7,5 +7,7 @@
     <string name="sql_query_compost_table_creation">CREATE TABLE Compost (id INTEGER PRIMARY KEY AUTOINCREMENT, busId TEXT, cardId TEXT,record TEXT, amount REAL)</string>
     <string name="sql_query_config_table_creation">CREATE TABLE Config (id INTEGER PRIMARY KEY AUTOINCREMENT, busId TEXT, minimumAmountToCompost REAL,compostAmount REAL)</string>
     <string name="title_activity_configure">ConfigureActivity</string>
+    <string name="title_activity_home">HomeActivity</string>
+
 
 </resources>

@@ -28,7 +28,7 @@ public class ConfigureActivity extends AppCompatActivity {
                 float minAmount= Float.parseFloat(((EditText)findViewById(R.id.minCompostTxt)).getText().toString());
                 float amount= Float.parseFloat(((EditText)findViewById(R.id.tarifTxt)).getText().toString());
                 Config cfg= new Config(busId,minAmount,amount);
-                MainActivity.configService.db_create(cfg);
+                HomeActivity.configService.db_create(cfg);
                 Toast.makeText(view.getContext(), "Configuration saved", Toast.LENGTH_LONG).show();
             }
 
