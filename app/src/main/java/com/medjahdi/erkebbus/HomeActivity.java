@@ -68,6 +68,8 @@ public class HomeActivity extends AppCompatActivity {
         firebaseDataBase.setLogLevel(BuildConfig.DEBUG ? Logger.Level.DEBUG : Logger.Level.NONE);
         compostService = new CompostService(firebaseDataBase, this);
         cardService = new CardService(firebaseDataBase, this);
+
+
         configService = new ConfigService(this, getString(R.string.sql_database_name));
         processing_mutex = false;
 
@@ -85,7 +87,7 @@ public class HomeActivity extends AppCompatActivity {
             //endregion
         else {
             Integer vid = Integer.parseInt(mainConfig.getVid());
-            arduino = new Arduino(this,vid);
+            arduino = new Arduino(this, vid);
             TextView tv = findViewById(R.id.busTextView);
             String busId = "Bus N°: " + mainConfig.getBusId();
             tv.setText(busId);
@@ -98,77 +100,15 @@ public class HomeActivity extends AppCompatActivity {
             oldBalanceView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    double[] balances = controller.runCompostTransaction("OP111");
-                    oldBalanceView.setText(String.valueOf(balances[0]));
-                    newBalanceView.setText(String.valueOf(balances[1]));
+                   // controller.runCompostTransaction("1B4621C4");
+
                 }
             });
 
 
             //endregion
-            /*
-            ProbeTable customTable = new ProbeTable();
-            customTable.addProduct(0x2A03, 0x0043, CdcAcmSerialDriver.class);
-            //customTable.addProduct(0x1234, 0x0002, CdcAcmSerialDriver.class);
-
-            UsbSerialProber prober = new UsbSerialProber(customTable);
-
-
-            UsbManager manager = (UsbManager) getSystemService(this.USB_SERVICE);
-            //   List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
-            List<UsbSerialDriver> availableDrivers = prober.findAllDrivers(manager);
-            if (availableDrivers.isEmpty()) {
-                return;
-            }
-
-// Open a connection to the first available driver.
-            UsbSerialDriver driver = availableDrivers.get(0);
-            UsbDevice device = driver.getDevice();
-            String ACTION_USB_PERMISSION = "com.medjahdi.erkebbus.USB_PERMISSION";
-
-            PendingIntent mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(
-                    ACTION_USB_PERMISSION), 0);
-            IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-            manager.requestPermission(device, mPermissionIntent);
-            boolean hasperm = manager.hasPermission(device);
-            UsbDeviceConnection connection = manager.openDevice(device);
-            if (connection == null) {
-                // You probably need to call UsbManager.requestPermission(driver.getDevice(), ..)
-                return;
-            }
-
-// Read some data! Most have just one port (port 0).
-            UsbSerialPort port = driver.getPorts().get(0);
-            try {
-                port.open(connection);
-                port.setParameters(9600, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
-                byte buffer[] = new byte[16];
-                String message = null;
-                while (true ) {
-                    int numBytesRead = port.read(buffer, 500);
-                    message += new String(buffer);
-                    String fromDuino = new String(message);
-System.out.println(fromDuino);
-                    Log.d(TAG, "Read " + numBytesRead + " bytes.");
-                }
-            } catch (IOException e) {
-                // Deal with error.
-            } finally {
-                try {
-                    port.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-
-
-*/
-
 
             try {
-
-
                 arduino.setArduinoListener(new ArduinoListener() {
                     @Override
                     public void onArduinoAttached(UsbDevice device) {
@@ -199,7 +139,7 @@ System.out.println(fromDuino);
                                     public void run() {
 
                                         oldBalanceView.setText("Ancien solde:" + String.valueOf(balances[0]));
-                                        newBalanceView.setText("Ancien solde:" + String.valueOf(balances[1]));
+                                        newBalanceView.setText("Nouveau solde:" + String.valueOf(balances[1]));
 
                                     }
                                 });
@@ -212,9 +152,7 @@ System.out.println(fromDuino);
                             System.out.println(ex);
                         }
 
-                        // double[] balances = controller.runCompostTransaction(fromDuino);
-                        //oldBalanceView.setText(String.valueOf(balances[0]));
-                        //newBalanceView.setText(String.valueOf(balances[1]));
+
                     }
 
                     @Override
@@ -227,7 +165,6 @@ System.out.println(fromDuino);
                         Toast.makeText(firebaseDataBase.getApp().getApplicationContext(), "Yo ! No permission to use the usb device ! sahhit", Toast.LENGTH_LONG).show();
                     }
                 });
-                // arduino.reopen();
             } catch (Exception ex) {
                 System.out.println(ex);
             }
@@ -235,6 +172,7 @@ System.out.println(fromDuino);
         }
 
     }
+
 
 
     public void gotoConfigurationActivity() {
